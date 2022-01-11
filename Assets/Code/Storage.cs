@@ -4,12 +4,13 @@ namespace Assets.Code
 {
     public class Storage<T> where T:IItem
     {
-        private List<T> _items;
+        private Stack<T> _items;
         private int _capacity;
         private int count;
+        public Action ChangeStorage;
         public Storage(int capacity) 
         {
-            _items = new List<T>(capacity);
+            _items = new Stack<T>(capacity);
             _capacity = capacity;
             count = 0;
         }
@@ -22,7 +23,8 @@ namespace Assets.Code
             if (item != null)
             {
                 count++;
-                _items.Add(item);
+                _items.Push(item);
+                ChangeStorage?.Invoke();
             }
             else
             {
@@ -30,19 +32,24 @@ namespace Assets.Code
             }
         }
 
-
         public T GetItem() 
         {
             if (count > 0)
             {
-                var item = _items[count - 1];
-                _items.RemoveAt(count-1);
                 count--;
-                return item;
+                ChangeStorage?.Invoke();
+                return _items.Pop();
+                                
             }
             else
                 return default(T);
         }
-     
+        public bool IsFull() =>
+            count >= _capacity;
+
+        public bool IsEmpty() =>
+            count == 0;
+        
+        
     }
 }

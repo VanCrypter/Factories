@@ -1,4 +1,6 @@
 ﻿namespace Assets.Code
 {
-    public interface IItem { }
+    public interface IItem 
+    {     
+    }
 }
