@@ -4,103 +4,108 @@ using Assets.Code.Items;
 using Assets.Code.Items.CertainItem;
 using System.Collections;
 using System;
+using DG.Tweening;
 
 namespace Assets.Code.Factory
 {
-    public class PlasticFactory : MonoBehaviour
+    public class PlasticFactory : BaseFactory
     {
-        [SerializeField] private float _timeForProduction = 1;
-        [SerializeField] private int _sizeStorage = 27;
+        [SerializeField] private int _sizeProductStorage = 27;
         [SerializeField] private int _sizeStorageCrude = 15;
         [SerializeField] private int _sizeStorageOil = 15;
-        [SerializeField] private GameObject _itemPrefab;
-        /// <summary>
-        /// For TESTS!!!
-        /// </summary>
-        [SerializeField] private GameObject _crudPrefab;
-        /// <summary>
-        /// For TESTS!!!
-        /// </summary>
-        [SerializeField] private GameObject _oilPrefab;
+        [SerializeField] private float _timeMovingItem;
+        [SerializeField] private ItemPlace _productPlace;
+        [SerializeField] private ItemPlace _resourceCrudePlace;
+        [SerializeField] private ItemPlace _resourceOilPlace;
+        [SerializeField] private LoadArea _resourcesLoadArea;
+        [SerializeField] private LoadArea _productLoadArea;
+        [SerializeField] private Transform _factoryPoint;
 
-        [SerializeField] private ProductPlace _productPlace;
-        [SerializeField] private ResourcePlace _resourceCrudePlace;
-        [SerializeField] private ResourcePlace _resourceOilPlace;
-
-        private Storage<Plastic> _productStorage;
         private Storage<Crude> _resourceStorageCrude;
         private Storage<Oil> _resourceStorageOil;
+        private Storage<Plastic> _productStorage;
         private WaitForSeconds _waitTimeProduction;
-        private bool _isWorking = false;
-
-        public Action<string> FailedToCreate;
-
-
-        public void Initialization()
-        {
-            _productStorage = new Storage<Plastic>(_sizeStorage);
-            _resourceStorageCrude = new Storage<Crude>(_sizeStorageCrude);
-            _resourceStorageOil = new Storage<Oil>(_sizeStorageOil);
-            _waitTimeProduction = new WaitForSeconds(_timeForProduction);
-
-        }
+        private ItemType _wantedResourceType2;
         private void Start()
         {
-            
             StartCreateProduct();
-            PutResource(new Crude(Instantiate(_crudPrefab)));
-            PutResource(new Crude(Instantiate(_crudPrefab)));
-            PutResource(new Crude(Instantiate(_crudPrefab)));
-            PutResource(new Crude(Instantiate(_crudPrefab)));
-            PutResource(new Crude(Instantiate(_crudPrefab)));
-            PutResource(new Crude(Instantiate(_crudPrefab)));
-            PutResource(new Crude(Instantiate(_crudPrefab)));
-            PutResource(new Crude(Instantiate(_crudPrefab)));
-            PutResource(new Crude(Instantiate(_crudPrefab)));
-            PutResource(new Crude(Instantiate(_crudPrefab)));
-            PutResource(new Crude(Instantiate(_crudPrefab)));
-            PutResource(new Crude(Instantiate(_crudPrefab)));
-            PutResource(new Crude(Instantiate(_crudPrefab)));
-            PutResource(new Crude(Instantiate(_crudPrefab)));
-            PutResource(new Crude(Instantiate(_crudPrefab)));
-            PutResource(new Oil(Instantiate(_oilPrefab)));
-            PutResource(new Oil(Instantiate(_oilPrefab)));
-            PutResource(new Oil(Instantiate(_oilPrefab)));
-            PutResource(new Oil(Instantiate(_oilPrefab)));
-            PutResource(new Oil(Instantiate(_oilPrefab)));
-            PutResource(new Oil(Instantiate(_oilPrefab)));
-            PutResource(new Oil(Instantiate(_oilPrefab)));
-            PutResource(new Oil(Instantiate(_oilPrefab)));
-            PutResource(new Oil(Instantiate(_oilPrefab)));
-            PutResource(new Oil(Instantiate(_oilPrefab)));
-            PutResource(new Oil(Instantiate(_oilPrefab))); 
-            PutResource(new Oil(Instantiate(_oilPrefab)));
-            PutResource(new Oil(Instantiate(_oilPrefab)));
-            PutResource(new Oil(Instantiate(_oilPrefab)));
-            PutResource(new Oil(Instantiate(_oilPrefab)));
             _productStorage.ChangeStorage += OnChangeProductStorage;
             _resourceStorageCrude.ChangeStorage += OnChangeResourceCrudeStorage;
             _resourceStorageOil.ChangeStorage += OnChangeResourceOilStorage;
-     
+
+        }
+        public void Initialization(float timeProduction, GameObject product)
+        {
+            _timeForProduction = timeProduction;
+            _productPrefab = product;
+            _creatingType = product.GetComponent<Item>().GetItemType;
+            _wantedResourceType = ItemType.Crude;
+            _wantedResourceType2 = ItemType.Oil;
+            _productStorage = new Storage<Plastic>(_sizeProductStorage);
+            _resourceStorageCrude = new Storage<Crude>(_sizeStorageCrude);
+            _resourceStorageOil = new Storage<Oil>(_sizeStorageOil);
+            _waitTimeProduction = new WaitForSeconds(_timeForProduction);
+            _resourcesLoadArea.Initialize(this);
+            _productLoadArea.Initialize(this);
         }
 
-        public Plastic TakeProduct()
-        {
-            return _productStorage.GetItem();
-        }
+        public override bool IsCanTake => IsCanTakeCrude || IsCanTakeOil;
+        public bool IsCanTakeCrude => _resourceStorageCrude.IsFull() == false;
+        public bool IsCanTakeOil => _resourceStorageOil.IsFull() == false;
+        public override bool IsCanGive => _productStorage.IsEmpty() == false;
 
-        public void PutResource(IResource resource)
+        public override Transform GetFirstEmptyResourcesPlace => _resourceCrudePlace.NearestEmptyPlacePoint();
+
+        public bool OneOfResourcesFull => _resourceStorageCrude.IsFull() == false || _resourceStorageOil.IsFull() == false;
+
+        public ItemType WantedResourceType2 { get => _wantedResourceType2; }
+
+
+        public Transform GetFirstEmptyResourcesPlaceByType(ItemType itemType)
         {
-            if (resource is Crude && _resourceStorageCrude.IsFull() == false)
+            switch (itemType)
+            {
+                case ItemType.Crude:
+                    return _resourceCrudePlace.NearestEmptyPlacePoint();
+                case ItemType.Oil:
+                    return _resourceOilPlace.NearestEmptyPlacePoint();
+                case ItemType.Plastic:
+                    throw new Exception($"{itemType} is invalid type in this case!");
+                default:
+                    throw new Exception($"Error! Unknown itemType {itemType}");
+            }
+        }      
+
+        public override bool TryPutResources<T>(T resource)
+        {
+            if (_resourceStorageCrude.IsFull() == false && resource is Crude)
             {
                 _resourceStorageCrude.AddItem(resource as Crude);
-                _resourceCrudePlace.Place(resource as Crude);                
+                _resourceCrudePlace.Place(_resourceStorageCrude.Last());
+                return true;
             }
 
-            if (resource is Oil && _resourceStorageOil.IsFull() == false)
+            if (_resourceStorageOil.IsFull() == false && resource is Oil)
             {
                 _resourceStorageOil.AddItem(resource as Oil);
-                _resourceOilPlace.Place(resource as Oil);
+                _resourceOilPlace.Place(_resourceStorageOil.Last());
+                return true;
+            }
+
+            return false;
+        }
+
+        public override bool TryGiveProduct(out IProduct product)
+        {
+            if (_productStorage.IsEmpty() == false)
+            {
+                product = _productStorage.GetItem();
+                return true;
+            }
+            else
+            {
+                product = default;
+                return false;
             }
         }
 
@@ -112,32 +117,56 @@ namespace Assets.Code.Factory
         private void OnChangeResourceCrudeStorage()
         {
             if (_isWorking == false)
-            {
                 StartCreateProduct();
-            }
+
         }
         private void OnChangeResourceOilStorage()
         {
             if (_isWorking == false)
-            {
                 StartCreateProduct();
-            }
+
         }
         private void OnChangeProductStorage()
         {
             if (_isWorking == false)
-            {
                 StartCreateProduct();
-            }
+
         }
 
         private void CreateProduct()
         {
-            var newItem = new Plastic(Instantiate(_itemPrefab));
-            _productStorage.AddItem(newItem);
-            _productPlace.Place(newItem);          
-            _resourceStorageCrude.GetItem().View.RemoveItem();
-            _resourceStorageOil.GetItem().View.RemoveItem();
+            var resourceCrude = _resourceStorageCrude.GetItem();
+            resourceCrude.transform.SetParent(null);
+            resourceCrude.transform.DOMove(_factoryPoint.position, _timeMovingItem).OnComplete(() => Destroy(resourceCrude.gameObject)); 
+            
+            var resourceOil = _resourceStorageOil.GetItem();
+            resourceOil.transform.SetParent(null);
+            resourceOil.transform.DOMove(_factoryPoint.position, _timeMovingItem).OnComplete(() => InstantiateNewProduct(resourceOil.gameObject));
+
+        }
+        private void InstantiateNewProduct(GameObject usedResource)
+        {
+            Destroy(usedResource);
+            var newItem = Instantiate(_productPrefab);
+            if (newItem.TryGetComponent(out Plastic plastic))
+                MoveProductToStorage(plastic);
+            else
+                throw new Exception($"{newItem} don't nave Plastic component!");
+
+        }
+
+        private void MoveProductToStorage(IProduct product)
+        {
+            var itemProduct = product as Item;
+            itemProduct.transform.position = _factoryPoint.transform.position;
+            itemProduct.transform.DOMove(_productPlace.NearestEmptyPlacePoint().position, _timeMovingItem)
+                .OnComplete(() => AddProduct(product));
+        }
+        private void AddProduct(IProduct product)
+        {
+            var itemProduct = product as Item;
+            _productStorage.AddItem(itemProduct as Plastic);
+            _productPlace.Place(itemProduct);
         }
 
         private IEnumerator Creation()
@@ -175,7 +204,7 @@ namespace Assets.Code.Factory
                 FailedToCreate?.Invoke($"PlasticFactory was stopped! Not enough Oil resource!");
                 return false;
             }
-                return true;
+            return true;
         }
 
         private void OnDestroy()

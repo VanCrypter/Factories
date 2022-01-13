@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6044639256203376794}
   - component: {fileID: 6522081056398114277}
   - component: {fileID: 1672296743497067923}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -104,8 +104,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7557501127752522297}
-  - component: {fileID: 8290427165262590990}
-  m_Layer: 0
+  - component: {fileID: 4020290673906275806}
+  m_Layer: 10
   m_Name: Plastic
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -127,7 +127,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8290427165262590990
+--- !u!114 &4020290673906275806
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -136,8 +136,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1877142047231523196}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d45ff213b9c8efb49ba367e88b40e306, type: 3}
+  m_Script: {fileID: 11500000, guid: 433ef48d9c9b9834880711b9a5057c96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _renderer: {fileID: 6522081056398114277}
-  _material: {fileID: 2100000, guid: cec7b4fd2713b5a4694504e2bf6a4e45, type: 2}
+  _material: {fileID: 2100000, guid: caf864b6eaada0b4c9a4aec8caecba99, type: 2}
+  _itemType: 2

@@ -11,8 +11,7 @@ GameObject:
   - component: {fileID: 738490496387803677}
   - component: {fileID: 6044639256203376794}
   - component: {fileID: 6522081056398114277}
-  - component: {fileID: 1672296743497067923}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -82,19 +81,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &1672296743497067923
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 11564824087636869}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1877142047231523196
 GameObject:
   m_ObjectHideFlags: 0
@@ -104,8 +90,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7557501127752522297}
-  - component: {fileID: 8290427165262590990}
-  m_Layer: 0
+  - component: {fileID: 6417686882776606577}
+  - component: {fileID: 2209207790404370313}
+  m_Layer: 10
   m_Name: Oil
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -127,7 +114,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8290427165262590990
+--- !u!65 &6417686882776606577
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1877142047231523196}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.3, y: 0.4, z: 0.3}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &2209207790404370313
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -136,8 +136,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1877142047231523196}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d45ff213b9c8efb49ba367e88b40e306, type: 3}
+  m_Script: {fileID: 11500000, guid: ec86b016d00823d45897bf59dc2b56d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _renderer: {fileID: 6522081056398114277}
   _material: {fileID: 2100000, guid: d69871c05746d0d4495a5c5dfa308528, type: 2}
+  _itemType: 1

@@ -1,28 +1,27 @@
-﻿using System;
+﻿using Assets.Code.Items;
+using System;
 using System.Collections.Generic;
 namespace Assets.Code
 {
-    public class Storage<T> where T:IItem
+    public class Storage<T> where T:Item
     {
         private Stack<T> _items;
-        private int _capacity;
-        private int count;
+        private int _capacity;       
         public Action ChangeStorage;
+        public int Count => _items.Count;
         public Storage(int capacity) 
         {
             _items = new Stack<T>(capacity);
-            _capacity = capacity;
-            count = 0;
+            _capacity = capacity;            
         }
         public void AddItem(T item) 
         {
-            if (count >= _capacity)
+            if (Count >= _capacity)
                 return;
                         
 
             if (item != null)
-            {
-                count++;
+            {                
                 _items.Push(item);
                 ChangeStorage?.Invoke();
             }
@@ -31,12 +30,20 @@ namespace Assets.Code
                 throw new Exception("Attempt to add an empty item!");
             }
         }
+        public T Last() 
+        {
+            if (Count > 0)
+            {
+                return _items.Peek();
+            }
+            else
+                return default;
 
+        }
         public T GetItem() 
         {
-            if (count > 0)
+            if (Count >= 0)
             {
-                count--;
                 ChangeStorage?.Invoke();
                 return _items.Pop();
                                 
@@ -45,11 +52,10 @@ namespace Assets.Code
                 return default(T);
         }
         public bool IsFull() =>
-            count >= _capacity;
+            Count >= _capacity;
 
         public bool IsEmpty() =>
-            count == 0;
-        
+            Count <= 0;        
         
     }
 }
